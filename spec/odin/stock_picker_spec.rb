@@ -8,43 +8,32 @@ RSpec.describe Odin::StockPicker do
   describe '#stock_picker' do
     subject { described_class.stock_picker(stock_prices) }
 
-    context 'with no days' do
-      let(:stock_prices) { [] }
-      it { is_expected.to eq(nil) }
-    end
+    shared_examples 'a stock picker' do |given:, it_returns:|
+      let(:stock_prices) { given }
 
-    context 'with one day' do
-      let(:stock_prices) { [15] }
-      it { is_expected.to eq(nil) }
-    end
-
-    context 'with two days' do
-      let(:stock_prices) { [15, 20] }
-      it { is_expected.to eq([0, 1]) }
-    end
-
-    context 'when the best recommendation breaks even' do
-      context 'with two stock prices' do
-        let(:stock_prices) { [20, 20] }
-        it { is_expected.to eq(nil) }
+      it "returns #{it_returns.inspect} given #{given.inspect}" do
+        expect(subject).to eq(it_returns)
       end
     end
 
-    context 'when the best recommendation loses money' do
-      context 'with two stock prices' do
-        let(:stock_prices) { [20, 15] }
-        it { is_expected.to eq(nil) }
-      end
-
-      context 'with many stock prices' do
-        let(:stock_prices) { [20, 19, 15, 14, 10, 5, 3, 2, 1] }
-        it { is_expected.to eq(nil) }
-      end
+    context 'with profitable scenarios' do
+      it_behaves_like 'a stock picker', given: [15, 20], it_returns: [0, 1]
+      it_behaves_like 'a stock picker', given: [17, 3, 6, 9, 15, 8, 6, 1, 10, 12], it_returns: [1, 4]
     end
 
-    context 'with ten days' do
-      let(:stock_prices) { [17, 3, 6, 9, 15, 8, 6, 1, 10, 12] }
-      it { is_expected.to eq [1, 4] }
+    context 'when multiple picks with the same profit exist, it returns the first found' do
+      it_behaves_like 'a stock picker', given: [1, 2, 1, 2], it_returns: [0, 1]
+    end
+
+    context 'when not given enough days' do
+      it_behaves_like 'a stock picker', given: [], it_returns: nil
+      it_behaves_like 'a stock picker', given: [15], it_returns: nil
+    end
+
+    context 'when there is no profitable pick' do
+      it_behaves_like 'a stock picker', given: [20, 20], it_returns: nil
+      it_behaves_like 'a stock picker', given: [20, 15], it_returns: nil
+      it_behaves_like 'a stock picker', given: [20, 19, 15, 14, 10, 5, 3, 2, 1], it_returns: nil
     end
   end
 end
