@@ -14,20 +14,28 @@ module Odin
     #
     # @return [Array<Integer, Integer>] the best day to have bought (index 0) and sold (index 1)
     #
-    def self.stock_picker(days) # rubocop:disable Metrics/MethodLength
+    def self.stock_picker(days) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
       return nil if days.length < 2
 
       max_profit = 0
       pick = nil
 
-      (0..(days.length - 2)).each do |buy_day|
-        buy_price = days[buy_day]
-        ((buy_day + 1)..(days.length - 1)).each do |sell_day|
-          sell_price = days[sell_day]
+      # Got through all the possible days you can buy and still have a day
+      # left over to sell
+      possible_buy_days = days[0..-2]
+      possible_buy_days.each_with_index do |buy_price, buy_index|
+        # Only look at days after the buy day
+        possible_sell_days = days[(buy_index + 1)..(days.length - 1)]
+        possible_sell_days.each_with_index do |sell_price, sell_offset|
           profit = sell_price - buy_price
+
+          # sell_offset is the index starting at zero after the buy_index.
+          # The sell_index must be calculated based on this.
+          sell_index = buy_index + sell_offset + 1
+
           if profit > max_profit
-            max_profit = sell_price - buy_price
-            pick = [buy_day, sell_day]
+            max_profit = profit
+            pick = [buy_index, sell_index]
           end
         end
       end
