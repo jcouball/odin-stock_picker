@@ -14,33 +14,36 @@ module Odin
     #
     # @return [Array<Integer, Integer>] the best day to have bought (index 0) and sold (index 1)
     #
-    def self.stock_picker(days) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
+    def self.stock_picker(days) # rubocop:disable Metrics/MethodLength
       return nil if days.length < 2
 
+      # Initialize with the first day as the lowest price seen so far
+      min_price = days[0]
+      min_price_index = 0
+
       max_profit = 0
-      pick = nil
+      best_days = nil
 
-      # Got through all the possible days you can buy and still have a day
-      # left over to sell
-      possible_buy_days = days[0..-2]
-      possible_buy_days.each_with_index do |buy_price, buy_index|
-        # Only look at days after the buy day
-        possible_sell_days = days[(buy_index + 1)..(days.length - 1)]
-        possible_sell_days.each_with_index do |sell_price, sell_offset|
-          profit = sell_price - buy_price
+      # Iterate through the days to find the best day to sell
+      days.each_with_index do |current_price, current_index|
+        # Skip the first day since we can't sell on the same day we start
+        next if current_index.zero?
 
-          # sell_offset is the index starting at zero after the buy_index.
-          # The sell_index must be calculated based on this.
-          sell_index = buy_index + sell_offset + 1
+        # Check if selling today yields a better profit than what we've seen
+        profit = current_price - min_price
+        if profit > max_profit
+          max_profit = profit
+          best_days = [min_price_index, current_index]
+        end
 
-          if profit > max_profit
-            max_profit = profit
-            pick = [buy_index, sell_index]
-          end
+        # Check if today's price is a new low point to buy at
+        if current_price < min_price
+          min_price = current_price
+          min_price_index = current_index
         end
       end
 
-      pick
+      best_days
     end
   end
 end
