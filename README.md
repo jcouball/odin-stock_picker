@@ -3,6 +3,12 @@
 Implements a stock picker that given daily stock prices for a stock, identifies the
 best day to buy and the best day to sell that stock.
 
+[Odin Stock Picker Project](https://www.theodinproject.com/lessons/ruby-stock-picker)
+
+[Solution Code](lib/odin/stock_picker.rb)
+
+[RSpec Tests](spec/odin/stock_picker_spec.rb)
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
@@ -19,7 +25,12 @@ gem install odin-stock_picker
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+> require 'odin/stock_picker'
+=> true
+Odin::StockPicker.stockpicker([17, 3, 6, 9, 15, 8, 6, 1, 10])
+=> [1, 4] # for a profit of $15 - $3 == $12
+```
 
 ## Development
 
